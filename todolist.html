@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Todo List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #todoInput {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        #todoList {
+            list-style-type: none;
+            padding: 0;
+        }
+        .todoItem {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+        .deleteButton {
+            float: right;
+            background-color: #ff3333;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Todo List</h1>
+    <input type="text" id="todoInput" placeholder="Enter a new task">
+    <ul id="todoList"></ul>
+
+    <script>
+        // Отримання елементів з DOM
+        const todoInput = document.getElementById('todoInput');
+        const todoList = document.getElementById('todoList');
+
+        // Функція для додавання нового завдання
+        function addTodo() {
+            const todoText = todoInput.value.trim(); // Отримуємо текст завдання і видаляємо зайві пробіли
+
+            if (todoText === '') {
+                alert('Please enter a task.');
+                return;
+            }
+
+            const todoItem = document.createElement('li');
+            todoItem.className = 'todoItem';
+            todoItem.innerHTML = `
+                ${todoText}
+                <button class="deleteButton">Delete</button>
+            `;
+            todoList.appendChild(todoItem);
+
+            saveTodos(); // Зберігаємо завдання в локальному сховищі
+
+            todoInput.value = ''; // Очищаємо поле вводу
+        }
+
+        // Функція для видалення завдання
+        function deleteTodo() {
+            const listItem = this.parentElement; // Визначаємо батьківський елемент (li)
+            todoList.removeChild(listItem);
+
+            saveTodos(); // Зберігаємо завдання в локальному сховищі
+        }
+
+        // Функція для збереження завдань в локальному сховищі
+        function saveTodos() {
+            const todos = [];
+            const todoItems = document.getElementsByClassName('todoItem');
+
+            for (let item of todoItems) {
+                todos.push(item.textContent.trim());
+            }
+
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        // Завантаження завдань з локального сховища при завантаженні сторінки
+        function loadTodos() {
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+            for (let todo of todos) {
+                const todoItem = document.createElement('li');
+                todoItem.className = 'todoItem';
+                todoItem.innerHTML = `
+                    ${todo}
+                    <button class="deleteButton">Delete</button>
+                `;
+                todoList.appendChild(todoItem);
+            }
+        }
+
+        // Викликаємо функцію завантаження при завантаженні сторінки
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTodos();
+        });
+
+        // Обробник події для кнопки додавання завдання
+        todoInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addTodo();
+            }
+        });
+
+        // Обробник події для кнопок видалення завдань
+        todoList.addEventListener('click', function(event) {
+            if (event.target.className === 'deleteButton') {
+                deleteTodo.call(event.target);
+            }
+        });
+    </script>
+</body>
+</html>
